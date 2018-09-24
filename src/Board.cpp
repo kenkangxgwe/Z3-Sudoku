@@ -9,7 +9,7 @@ namespace Z3_Sudoku
 expr mk_eq(context &ctx, SymName const &sym_name, Digit digit)
 {
     expr_vector conditions{ctx};
-    for(int i  = 0; i < 4; i ++) {
+    for(int i = 0; i < 4; i++) {
         SymName new_sym_name(sym_name);
         new_sym_name.push_back(i);
         if((digit() >> i) & 1) {
@@ -26,8 +26,8 @@ expr partitionConsistency(context &ctx, Partition const &part, std::string const
     expr_vector part_cons(ctx);
     for(int i = 0; i < part.size(); i++) {
         expr_vector cell_cons(ctx);
-        RowNum row = std::get<0>(part[i]);
-        ColNum col = std::get<1>(part[i]);
+        RowNum row(part[i].first);
+        ColNum col(part[i].second);
         for(int d = Digit::LB; d <= Digit::UB; d++) {
             expr antecedent = mk_eq(ctx, {sym_name, {row(), col()}}, d);
             if(d == 0) {
@@ -39,7 +39,7 @@ expr partitionConsistency(context &ctx, Partition const &part, std::string const
             for(int j = 0; j < part.size(); j++) {
                 if(i != j) {
                     consequences.push_back(!mk_eq(ctx, {sym_name,
-                                                        {std::get<0>(part[j])(), std::get<1>(part[j])()}}, d));
+                                                        {(part[j].first)(), (part[j].second)()}}, d));
                 }
             }
             cell_cons.push_back(implies(antecedent, mk_and(consequences)));
@@ -49,19 +49,19 @@ expr partitionConsistency(context &ctx, Partition const &part, std::string const
     return mk_and(part_cons);
 }
 
-z3::expr getConstraints(z3::context &ctx, Board const &board, std::string const &sym_name)
+z3::expr getConstraints(z3::context &ctx, std::string const &sym_name)
 {
     expr_vector conditions(ctx);
     for(int r = 0; r < RowNum::size; r++) {
-        conditions.push_back(partitionConsistency(ctx, board.getRow(r), sym_name));
+        conditions.push_back(partitionConsistency(ctx, Board::getRow(r), sym_name));
     }
 
     for(int c = 0; c < ColNum::size; c++) {
-        conditions.push_back(partitionConsistency(ctx, board.getCol(c), sym_name));
+        conditions.push_back(partitionConsistency(ctx, Board::getCol(c), sym_name));
     }
 
     for(int b = 0; b < RowNum::size; b++) {
-        conditions.push_back(partitionConsistency(ctx, board.getBlk(b), sym_name));
+        conditions.push_back(partitionConsistency(ctx, Board::getBlk(b), sym_name));
     }
     return mk_and(conditions);
 }
@@ -112,7 +112,7 @@ std::vector<Cell> Board::checkInitial(context &ctx, solver &sol)
 {
     expr_vector constraints(ctx);
     // consistency constraints
-    constraints.push_back(getConstraints(ctx, *this, "i"));
+    constraints.push_back(getConstraints(ctx, "i"));
 
     // initial assumptions
     for(int r = 0; r < RowNum::size; r++) {
@@ -168,7 +168,7 @@ check_result Board::findSolution(context &ctx, solver &sol)
     expr_vector constraints(ctx);
 
     // consistency constraints
-    constraints.push_back(getConstraints(ctx, *this, "f"));
+    constraints.push_back(getConstraints(ctx, "f"));
 
     // initial constraints
     for(int r = 0; r < RowNum::size; r++) {
@@ -210,32 +210,36 @@ check_result Board::findSolution(context &ctx, solver &sol)
     return sol.check();
 }
 
-Row Board::getRow(RowNum rownum) const
+constexpr Row Board::getRow(RowNum const rownum)
 {
     Row row = {};
     for(int c = 0; c < ColNum::size; c++) {
-        row[c] = std::make_tuple(rownum(), c, cells[rownum()][c]);
+        row[c].first = rownum;
+        row[c].second = std::move(ColNum(c));
+        //row[c] = std::make_pair(rownum, c);
     }
     return row;
 }
 
-Col Board::getCol(ColNum colnum) const
+constexpr Col Board::getCol(ColNum colnum)
 {
     Col col = {};
     for(int r = 0; r < RowNum::size; r++) {
-        col[r] = std::make_tuple(r, colnum(), cells[r][colnum()]);
+        col[r].first = std::move(RowNum(r));
+        col[r].second = colnum;
+        //col[r] = std::make_pair(r, colnum);
     }
     return col;
 }
 
-Blk Board::getBlk(BlkNum blknum) const
+constexpr Blk Board::getBlk(BlkNum blknum)
 {
     Blk blk = {};
     for(int i = 0; i < BlkNum::size / 3; i++) {
         for(int j = 0; j < BlkNum::size / 3; j++) {
-            blk[i * 3 + j] = std::make_tuple(
-                    blknum() - blknum() % 3 + i,
-                    (blknum() % 3) * 3 + j, cells[blknum() - blknum() % 3 + i][(blknum() % 3) * 3 + j]);
+            blk[i * 3 + j].first = std::move(RowNum(blknum() - blknum() % 3 + i));
+            blk[i * 3 + j].second = std::move(ColNum((blknum() % 3) * 3 + j));
+            //blk[i * 3 + j] = std::make_pair(blknum() - blknum() % 3 + i, (blknum() % 3) * 3 + j);
         }
     }
     return blk;

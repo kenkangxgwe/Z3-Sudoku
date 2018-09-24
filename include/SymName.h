@@ -12,9 +12,9 @@ public:
     class exception{
     public:
         enum TYPE {
-            NONAME, NOCLOSE
+            NONAME
         };
-        exception(TYPE);
+        constexpr exception(TYPE);
         char const *msg();
     private:
         TYPE exception_type;

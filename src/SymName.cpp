@@ -6,7 +6,7 @@
 namespace Z3_Sudoku
 {
 
-SymName::SymName(std::string sym_string)
+SymName::SymName(std::string const sym_string)
 {
     size_t name_end_pos = sym_string.find('_');
     if(name_end_pos == std::string::npos) {
@@ -73,7 +73,7 @@ void SymName::setName(std::string new_name)
     name = std::move(new_name);
 }
 
-SymName::exception::exception(SymName::exception::TYPE type)
+constexpr SymName::exception::exception(SymName::exception::TYPE type)
         :exception_type(type)
 {
 }
@@ -84,10 +84,8 @@ char const *SymName::exception::msg()
         case NONAME: {
             return "The input parameter has no name.";
         }
-        case NOCLOSE:{
-            return "The input parameter has no closed bracket ')'.";
-        }
     }
+    return "An unknown error occurred";
 }
 
 }

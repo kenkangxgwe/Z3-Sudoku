@@ -11,12 +11,12 @@ class FiniteDomain
 
     class exception {
     public:
-        explicit exception(int num) {
+        constexpr explicit exception(int const num) {
             msg_string = "Invalide num " + std::to_string(num)
                     + ", the number should be in the range of ["
                     + std::to_string(L) + ", " +std::to_string(U) + "].";
         };
-        char const *msg() const {
+        constexpr char const *msg(){
             return msg_string.c_str();
         };
 
@@ -29,21 +29,41 @@ public:
     static int const UB = U;
     static int const size = U - L + 1;
 
-    FiniteDomain() {
+    constexpr FiniteDomain() {
         value = L;
     };
 
-    FiniteDomain(int num) {
+    constexpr FiniteDomain(int const num) {
         if(num < L || num > U) {
             throw(exception(num));
         }
         value = num;
     };
 
-    FiniteDomain(std::string const &num_string)
+    constexpr FiniteDomain(std::string const &num_string)
             :FiniteDomain(std::stoi(num_string)) {};
 
-    inline int operator()() const {
+    constexpr FiniteDomain(FiniteDomain<L,U> const &newfd)
+            :value(newfd.value)
+    {
+    }
+
+    constexpr FiniteDomain(FiniteDomain<L,U> &&newfd) noexcept
+            :value(std::move(newfd.value))
+    {
+    }
+
+    constexpr FiniteDomain<L,U> &operator=(FiniteDomain<L,U> const &newfd) {
+        value = newfd.value;
+        return (*this);
+    };
+
+    constexpr FiniteDomain<L,U> &operator=(FiniteDomain<L,U> &&newfd) noexcept{
+        value = std::move(newfd.value);
+        return (*this);
+    };
+
+    constexpr inline int operator()() const {
         return value;
     };
 
@@ -59,7 +79,7 @@ inline std::ostream &operator<<(std::ostream& out, typename FiniteDomain<L, U>::
 }
 
 template<int L, int U>
-inline bool operator==(FiniteDomain<L, U> d1, FiniteDomain<L, U> d2)
+inline constexpr bool operator==(FiniteDomain<L, U> d1, FiniteDomain<L, U> d2)
 {
     return d1() == d2();
 }
