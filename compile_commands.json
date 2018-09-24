@@ -1,0 +1,7 @@
+[
+{
+  "directory": "D:/Projects/Courses/EEE5702/Assignment2/cmake-build-debug",
+  "command": "D:\\Programs\\msys64\\mingw64\\bin\\gcc.exe   -g   -std=gnu11 -o CMakeFiles\\Assignment2.dir\\main.c.obj   -c D:\\Projects\\Courses\\EEE5702\\Assignment2\\main.c",
+  "file": "D:/Projects/Courses/EEE5702/Assignment2/main.c"
+}
+]
