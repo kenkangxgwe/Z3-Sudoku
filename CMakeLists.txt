@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_FILES
         src/SymName.cpp
-        src/NumPred.cpp
         src/Board.cpp
         src/main.cpp
         )

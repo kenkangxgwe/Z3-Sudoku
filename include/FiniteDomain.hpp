@@ -16,7 +16,7 @@ class FiniteDomain
                     + ", the number should be in the range of ["
                     + std::to_string(L) + ", " +std::to_string(U) + "].";
         };
-        char const *msg() {
+        char const *msg() const {
             return msg_string.c_str();
         };
 

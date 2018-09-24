@@ -1,6 +1,7 @@
 #include <utility>
+
+#include <utility>
 #include <cstdlib>
-#include <iostream>
 
 //
 // Created by kenkangxgwe on 2018.9.23.
@@ -36,9 +37,6 @@ SymName::SymName(std::string name, std::initializer_list<int> list)
         : name(std::move(name)), subscripts(list)
 {
     updateSubString();
-    if(subscripts.size() == 1) {
-        std::cout << sub_string << std::endl;
-    }
 }
 
 std::string Z3_Sudoku::SymName::toString() const
@@ -78,7 +76,7 @@ int SymName::getSub(size_t pos) const
 
 void SymName::setName(std::string new_name)
 {
-    name = new_name;
+    name = std::move(new_name);
 }
 
 SymName::exception::exception(SymName::exception::TYPE type)
