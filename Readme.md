@@ -204,6 +204,7 @@ it finds a solution.
 
 1. Build  
 Requires [z3 library](https://github.com/Z3Prover/z3) to be installed.  
+Requires compiler with C++17 support.  
 Use [CMake](https://cmake.org/) to build.
 
 2. Run  
