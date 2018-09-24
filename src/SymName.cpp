@@ -1,13 +1,7 @@
-#include <utility>
-
+#include "SymName.h"
 #include <utility>
 #include <cstdlib>
 
-//
-// Created by kenkangxgwe on 2018.9.23.
-//
-
-#include "SymName.h"
 
 namespace Z3_Sudoku
 {

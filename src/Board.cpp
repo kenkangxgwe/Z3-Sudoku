@@ -9,10 +9,10 @@ namespace Z3_Sudoku
 expr mk_eq(context &ctx, SymName const &sym_name, Digit digit)
 {
     expr_vector conditions{ctx};
-    for(int i = Digit::LB + 1; i <= Digit::UB; i++) {
+    for(int i  = 0; i < 4; i ++) {
         SymName new_sym_name(sym_name);
         new_sym_name.push_back(i);
-        if(i == digit()) {
+        if((digit() >> i) & 1) {
             conditions.push_back(ctx.bool_const(new_sym_name.toString().c_str()));
         } else {
             conditions.push_back(!ctx.bool_const(new_sym_name.toString().c_str()));
@@ -114,7 +114,7 @@ std::vector<Cell> Board::checkInitial(context &ctx, solver &sol)
     // consistency constraints
     constraints.push_back(getConstraints(ctx, *this, "i"));
 
-    // initial constraints
+    // initial assumptions
     for(int r = 0; r < RowNum::size; r++) {
         for(int c = 0; c < RowNum::size; c++) {
             constraints.push_back(implies(
@@ -124,7 +124,7 @@ std::vector<Cell> Board::checkInitial(context &ctx, solver &sol)
         }
     }
 
-    // initial symbols
+    // assumption symbols
     expr_vector cell_syms(ctx);
     for(int r = 0; r < RowNum::size; r++) {
         for(int c = 0; c < ColNum::size; c++) {
@@ -259,11 +259,13 @@ Layout Board::retrieveBoard(context &ctx, model const &model)
 
     for(int r = 0; r < RowNum::size; r++) {
         for(int c = 0; c < ColNum::size; c++) {
-            for(int d = Digit::LB + 1; d <= Digit::UB; d++) {
+            int num = 0;
+            for(int d = 0; d < 4; d++) {
                 if(model.eval(ctx.bool_const(SymName("f", {r, c, d}).toString().c_str())).bool_value() == Z3_L_TRUE) {
-                    solution[r][c] = Digit(d);
+                    num |= 1 << d;
                 }
             }
+            solution[r][c] = Digit(num);
         }
     }
     return solution;
