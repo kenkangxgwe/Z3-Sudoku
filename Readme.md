@@ -8,8 +8,8 @@ All the rules and constraints are **only** represented in propositional logic.
 To formalize the problem in propositional logic, we should not make the
 programming language to do any preprocessing which results in simplication of
 the logic system. Thus the program should construct the expressions in Z3
-without any prior knowledge of the initial input, and assign the value of some
-Boolean constants according to the input.
+without any prior knowledge of the initial input, and only depend on the input
+when assigning the boolean constants.
 
 ### Number Encoding 
 
@@ -21,7 +21,7 @@ using either binary or enumeration. The advantage of using binary is, we only
 need 4 bits to represent a digit from `0` to `9`, otherwise we need 9 bits with
 extra unique constraints.
 
-We define Boolean variables `x(r,c,b)` to represent the b-th bit of `cell(r,c)` is
+We define boolean variables `x(r,c,b)` to represent the b-th bit of `cell(r,c)` is
 equal to 1. `x` is only a name, and `r`, `c` are indices running from `0` to `8`
 and `b` running from `0` to `3`. Thus, the value of `cell(r,c)` is
 
@@ -30,7 +30,7 @@ and `b` running from `0` to `3`. Thus, the value of `cell(r,c)` is
 ```
 
 , where `<<` is the left shift operator and `||` is the or operator in C++ . In
-all, we need 324 Boolean constants to represent the digits of the entire board. (We
+all, we need 324 boolean constants to represent the digits of the entire board. (We
 may need 810 if we apply enumeration method.)
 
 We encapsulate the encoding process into a C++ function `Eq(r,c,d)` which returns a Z3
@@ -203,9 +203,9 @@ it finds a solution.
 ## Usage
 
 1. Build  
-Requires [z3 library](https://github.com/Z3Prover/z3) to be installed.  
-Requires compiler with C++17 support.  
-Use [CMake](https://cmake.org/) to build.
+    * Requires [z3 library](https://github.com/Z3Prover/z3) to be installed.
+    * Requires compiler with C++17 support.
+    * Use [CMake](https://cmake.org/) to build.
 
 2. Run  
 It takes a file name as input, the file should consists of 9 lines, each line with nine digits separated by a comma. If a cell is set to `0`, it is considered to be empty.
