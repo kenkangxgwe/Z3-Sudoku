@@ -6,6 +6,9 @@ using namespace z3;
 namespace Z3_Sudoku
 {
 
+/**
+ * Enocde a digit into 4-bit boolean constant
+ */
 expr mk_eq(context &ctx, SymName const &sym_name, Digit digit)
 {
     expr_vector conditions{ctx};
@@ -38,8 +41,9 @@ expr partitionConsistency(context &ctx, Partition const &part, std::string const
             expr_vector consequences(ctx);
             for(int j = 0; j < part.size(); j++) {
                 if(i != j) {
-                    consequences.push_back(!mk_eq(ctx, {sym_name,
-                                                        {(part[j].first)(), (part[j].second)()}}, d));
+                    consequences.push_back(
+                            !mk_eq(ctx, {sym_name, {(part[j].first)(), (part[j].second)()}}, d)
+                    );
                 }
             }
             cell_cons.push_back(implies(antecedent, mk_and(consequences)));
